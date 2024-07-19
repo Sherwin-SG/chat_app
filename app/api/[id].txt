@@ -1,0 +1,37 @@
+import { NextApiRequest, NextApiResponse } from 'next';
+import dbConnect from '../../lib/dbConnect';
+import User from '../../models/User';
+import { authenticate } from '../../lib/middleware/auth';
+
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  await dbConnect();
+
+  const { method } = req;
+
+  switch (method) {
+    case 'GET':
+      try {
+        const user = await User.findById(req.query.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.status(200).json(user);
+      } catch (error) {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+      break;
+    case 'PUT':
+      try {
+        const user = await User.findByIdAndUpdate(req.query.id, req.body, { new: true });
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        res.status(200).json(user);
+      } catch (error) {
+        res.status(500).json({ message: 'Internal server error' });
+      }
+      break;
+    default:
+      res.setHeader('Allow', ['GET', 'PUT']);
+      res.status(405).end(`Method ${method} Not Allowed`);
+      break;
+  }
+}
+
+export default authenticate(handler);
