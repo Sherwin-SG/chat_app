@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       { $addToSet: { friends: currentUser._id } }
     );
 
-    return NextResponse.json({ message: 'Friend added successfully' });
+    return NextResponse.json({ message: 'Friend added successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error adding friend:', error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });

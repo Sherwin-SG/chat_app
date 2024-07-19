@@ -1,56 +1,37 @@
 import React, { useState } from 'react';
-import { useSession } from 'next-auth/react';
+import axios from 'axios';
 
-const AddFriend = () => {
-  const { data: session } = useSession();
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
+const AddFriendButton = () => {
+  const [friendEmail, setFriendEmail] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
 
-  const handleAddFriend = async () => {
-    if (!email) {
-      setMessage('Please enter an email');
-      return;
-    }
-
+  const addFriend = async () => {
     try {
-      const response = await fetch('/api/friends/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'user-email': session?.user?.email || '', // Send current user email as header
-        },
-        body: JSON.stringify({ email }),
-      });
+      const response = await axios.post('/api/friends/add', { email: friendEmail });
 
-      const data = await response.json();
-      if (data.success) {
-        setMessage('Friend added successfully!');
+      if (response.status === 200) {
+        setStatusMessage('Friend added successfully');
       } else {
-        setMessage(data.error || 'Failed to add friend');
+        setStatusMessage(`Failed to add friend: ${response.data.message}`);
       }
     } catch (error) {
-      setMessage('An error occurred');
+      setStatusMessage('Failed to add friend');
+      console.error('Error adding friend:', error);
     }
   };
 
   return (
-    <div className="p-4">
+    <div>
       <input
         type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        value={friendEmail}
+        onChange={(e) => setFriendEmail(e.target.value)}
         placeholder="Enter friend's email"
-        className="p-2 border border-gray-300 rounded"
       />
-      <button
-        onClick={handleAddFriend}
-        className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Add Friend
-      </button>
-      {message && <p className="mt-2">{message}</p>}
+      <button onClick={addFriend}>Add Friend</button>
+      {statusMessage && <p>{statusMessage}</p>}
     </div>
   );
 };
 
-export default AddFriend;
+export default AddFriendButton;
