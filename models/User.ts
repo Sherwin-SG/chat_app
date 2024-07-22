@@ -13,7 +13,7 @@ const userSchema: Schema = new mongoose.Schema({
   password: { type: String },  // Make password optional
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 }, {
-  timestamps: true
+  timestamps: true // Adds createdAt and updatedAt fields
 });
 
 export default mongoose.models.User || mongoose.model<IUser>('User', userSchema);

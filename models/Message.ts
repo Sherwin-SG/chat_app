@@ -1,19 +1,20 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IMessage extends Document {
-  senderId: mongoose.Types.ObjectId;
-  receiverId: mongoose.Types.ObjectId;
+interface IMessage extends Document {
   content: string;
-  timestamp: Date;
+  senderEmail: string;
+  receiverEmail: string;
 }
 
-const messageSchema: Schema = new mongoose.Schema({
-  senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  receiverId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+const messageSchema = new Schema<IMessage>({
   content: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now },
+  senderEmail: { type: String, required: true },
+  receiverEmail: { type: String, required: true },
 }, {
-  timestamps: true
+  timestamps: true, // This will add createdAt and updatedAt fields automatically
 });
 
-export default mongoose.models.Message || mongoose.model<IMessage>('Message', messageSchema);
+// Avoid overwriting the model if it already exists
+const Message = mongoose.models.Message || mongoose.model<IMessage>('Message', messageSchema);
+
+export default Message;
