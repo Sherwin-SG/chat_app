@@ -1,8 +1,9 @@
-// app/components/ChatWindow.tsx
-
 import React, { useEffect, useState, FormEvent, useRef } from 'react';
 import MessageList from './MessageList';
-import { Message } from '../types'; // Ensure correct import path
+import { Message } from '../types';
+import io from 'socket.io-client';
+
+const socket = io();
 
 const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ userEmail, friendEmail }) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -10,7 +11,6 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -34,11 +34,19 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
     };
 
     fetchMessages();
+
+    socket.on('receiveMessage', (message: Message) => {
+      setMessages(prevMessages => [...prevMessages, message]);
+    });
+
+    return () => {
+      socket.off('receiveMessage');
+    };
   }, [userEmail, friendEmail]);
 
   useEffect(() => {
-    // Position the view to the latest message on initial load
-    if (messages.length > 0 && messageContainerRef.current) {
+    // Scroll to the bottom when messages are loaded or updated
+    if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
   }, [messages]);
@@ -46,6 +54,14 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
   const handleSendMessage = async (e: FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
+
+    const message = {
+      senderEmail: userEmail,
+      content: newMessage,
+      createdAt: new Date().toISOString(),
+    };
+
+    socket.emit('sendMessage', message);
 
     try {
       const response = await fetch(`/api/messages/${userEmail}/${friendEmail}`, {
@@ -79,7 +95,6 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
         className="flex-grow overflow-y-auto p-4 space-y-4"
       >
         <MessageList messages={messages} currentUserEmail={userEmail} />
-        <div ref={messagesEndRef} />
       </div>
       <form onSubmit={handleSendMessage} className="flex p-4 border-t border-gray-300 bg-white">
         <input
