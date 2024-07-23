@@ -56,7 +56,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <Sidebar />
+      {/*<Sidebar />*/}
       <div className="flex flex-col flex-1 p-8">
         <Header />
         <main className="flex-1 flex bg-white rounded-lg shadow-md">

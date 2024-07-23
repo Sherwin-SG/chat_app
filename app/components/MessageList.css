@@ -1,0 +1,24 @@
+.message-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .message {
+    max-width: 60%;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+  }
+  
+  .sent {
+    align-self: flex-end;
+    background-color: #DCF8C6; /* Light green background for sent messages */
+  }
+  
+  .received {
+    align-self: flex-start;
+    background-color: #FFFFFF; /* White background for received messages */
+  }
+  

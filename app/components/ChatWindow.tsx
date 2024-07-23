@@ -1,6 +1,6 @@
 // app/components/ChatWindow.tsx
 
-import React, { useEffect, useState, FormEvent } from 'react';
+import React, { useEffect, useState, FormEvent, useRef } from 'react';
 import MessageList from './MessageList';
 import { Message } from '../types'; // Ensure correct import path
 
@@ -9,6 +9,9 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messageContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -32,6 +35,13 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
 
     fetchMessages();
   }, [userEmail, friendEmail]);
+
+  useEffect(() => {
+    // Position the view to the latest message on initial load
+    if (messages.length > 0 && messageContainerRef.current) {
+      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleSendMessage = async (e: FormEvent) => {
     e.preventDefault();
@@ -63,16 +73,25 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
   if (error) return <p>{error}</p>;
 
   return (
-    <div>
-      <MessageList messages={messages} />
-      <form onSubmit={handleSendMessage}>
+    <div className="flex flex-col h-[80vh] max-h-[80vh]">
+      <div 
+        ref={messageContainerRef}
+        className="flex-grow overflow-y-auto p-4 space-y-4"
+      >
+        <MessageList messages={messages} currentUserEmail={userEmail} />
+        <div ref={messagesEndRef} />
+      </div>
+      <form onSubmit={handleSendMessage} className="flex p-4 border-t border-gray-300 bg-white">
         <input
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type your message"
+          className="flex-grow p-2 border rounded-lg mr-2"
         />
-        <button type="submit">Send</button>
+        <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          Send
+        </button>
       </form>
     </div>
   );

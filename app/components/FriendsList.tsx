@@ -1,11 +1,5 @@
-// components/FriendsList.tsx
+// app/components/FriendsList.tsx
 import React from 'react';
-
-// Define the types for the props
-interface FriendsListProps {
-  friends: Friend[];
-  onSelectFriend: React.Dispatch<React.SetStateAction<Friend | null>>;
-}
 
 interface Friend {
   _id: string;
@@ -13,16 +7,24 @@ interface Friend {
   email?: string;
 }
 
+interface FriendsListProps {
+  friends: Friend[];
+  onSelectFriend: (friend: Friend) => void;
+}
+
 const FriendsList: React.FC<FriendsListProps> = ({ friends, onSelectFriend }) => {
   return (
-    <div>
-      <ul>
-        {friends.map((friend) => (
-          <li key={friend._id} onClick={() => onSelectFriend(friend)}>
-            {friend.name || friend.email}
-          </li>
-        ))}
-      </ul>
+    <div className="space-y-4">
+      {friends.map((friend) => (
+        <div
+          key={friend._id}
+          className="p-4 bg-white rounded-lg shadow-md hover:bg-gray-100 cursor-pointer"
+          onClick={() => onSelectFriend(friend)}
+        >
+          <h3 className="text-lg font-semibold">{friend.name || friend.email}</h3>
+          <p className="text-sm text-gray-600">{friend.email}</p>
+        </div>
+      ))}
     </div>
   );
 };
