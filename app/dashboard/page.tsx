@@ -67,7 +67,11 @@ const Dashboard: React.FC = () => {
             ) : error ? (
               <p>{error}</p>
             ) : (
-              <FriendsList friends={friends} onSelectFriend={setSelectedFriend} />
+              <FriendsList 
+                friends={friends} 
+                onSelectFriend={setSelectedFriend} 
+                selectedFriend={selectedFriend} // Pass the selectedFriend prop
+              />
             )}
           </div>
           <div className="flex-1 p-4">

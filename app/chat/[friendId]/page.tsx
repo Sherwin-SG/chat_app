@@ -81,7 +81,7 @@ const ChatPage = () => {
   return (
     <div>
       <h1>Chat with {friendId}</h1>
-      <MessageList messages={messages} />
+      <MessageList messages={messages} currentUserEmail={userEmail}/>
       <MessageInput 
         value={newMessage} 
         onChange={handleChange} 

@@ -17,8 +17,11 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
     const fetchMessages = async () => {
       try {
         const response = await fetch(`/api/messages/${userEmail}/${friendEmail}`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
         const data = await response.json();
-        
+
         if (Array.isArray(data)) {
           setMessages(data);
         } else {
@@ -35,11 +38,13 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
 
     fetchMessages();
 
+    // Listen for new messages
     socket.on('receiveMessage', (message: Message) => {
       setMessages(prevMessages => [...prevMessages, message]);
     });
 
     return () => {
+      // Clean up the listener on component unmount
       socket.off('receiveMessage');
     };
   }, [userEmail, friendEmail]);
@@ -57,32 +62,23 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
 
     const message = {
       senderEmail: userEmail,
+      receiverEmail: friendEmail,
       content: newMessage,
       createdAt: new Date().toISOString(),
     };
 
+    // Emit the message via socket
     socket.emit('sendMessage', message);
 
-    try {
-      const response = await fetch(`/api/messages/${userEmail}/${friendEmail}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content: newMessage }),
-      });
-      const data = await response.json();
+    // Save the message to the database
+    await fetch(`/api/messages/${userEmail}/${friendEmail}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: newMessage }),
+    });
 
-      if (data.success) {
-        setMessages(prevMessages => [...prevMessages, data.message]);
-        setNewMessage('');
-      } else {
-        setError(data.message);
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setError('Failed to send message');
-    }
+    // Clear the input field after sending the message
+    setNewMessage('');
   };
 
   if (loading) return <p>Loading...</p>;
