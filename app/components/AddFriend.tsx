@@ -21,15 +21,25 @@ const AddFriendButton = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center mt-4">
       <input
         type="email"
         value={friendEmail}
         onChange={(e) => setFriendEmail(e.target.value)}
         placeholder="Enter friend's email"
+        className="w-full max-w-md px-4 py-2 mb-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
       />
-      <button onClick={addFriend}>Add Friend</button>
-      {statusMessage && <p>{statusMessage}</p>}
+      <button
+        onClick={addFriend}
+        className="w-full max-w-md px-4 py-2 mb-2 text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors"
+      >
+        Add Friend
+      </button>
+      {statusMessage && (
+        <p className={`mt-2 ${statusMessage.includes('successfully') ? 'text-green-600' : 'text-red-600'}`}>
+          {statusMessage}
+        </p>
+      )}
     </div>
   );
 };

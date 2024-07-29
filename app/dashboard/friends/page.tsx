@@ -2,32 +2,24 @@
 
 import React from 'react';
 import { useSession } from 'next-auth/react';
-import AddFriend from '../../components/AddFriend'; // Adjust the path if needed
+import AddFriend from '../../components/AddFriend'; 
 
 const FriendsPage = () => {
   const { data: session } = useSession();
 
   if (!session) {
-    return <p>Loading...</p>;
+    return <p className="text-center text-gray-500">Loading...</p>;
   }
 
   return (
-    <div className="flex flex-col flex-1 p-8">
-      <Header />
-      <main className="flex-1 p-4 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold">Friends</h1>
-        <p className="mt-2">Manage your friends and add new ones.</p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div className="p-6 bg-white rounded-lg shadow-md w-full max-w-md">
+        <h1 className="text-2xl font-bold mb-4 text-center">Friends</h1>
         <AddFriend />
         {/* Here you can also list current friends or other friend-related functionalities */}
-      </main>
+      </div>
     </div>
   );
 };
-
-const Header = () => (
-  <header className="flex items-center justify-between p-4 bg-white rounded-lg shadow-md">
-    <h1 className="text-xl font-bold">Friends</h1>
-  </header>
-);
 
 export default FriendsPage;

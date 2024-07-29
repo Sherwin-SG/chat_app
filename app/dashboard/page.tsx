@@ -7,7 +7,7 @@ import axios from 'axios';
 import FriendsList from '../components/FriendsList';
 import ChatWindow from '../components/ChatWindow'; // Renamed from ChatPage
 import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
+
 
 interface Friend {
   _id: string;
