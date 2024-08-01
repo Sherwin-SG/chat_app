@@ -16,10 +16,26 @@ export default function Login() {
     setError('');
 
     try {
+      // Send login request to your custom API
       const response = await axios.post('/api/login', { email, password });
+      
       if (response.status === 200) {
-        localStorage.setItem('token', response.data.token);
-        router.push('/dashboard');
+        // Assuming you get a token from the response
+        const { token } = response.data;
+        localStorage.setItem('token', token); // Store token in localStorage
+        
+        // Sign in with NextAuth to manage the session
+        const result = await signIn('credentials', {
+          redirect: false,
+          email,
+          password,
+        });
+
+        if (result?.error) {
+          setError(result.error);
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch (error: any) {
       setError(error.response?.data.message || 'Something went wrong');

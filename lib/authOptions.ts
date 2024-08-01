@@ -1,8 +1,10 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from 'next-auth/providers/github';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import mongoose from 'mongoose';
 import User from '@/models/User'; // Adjust the path to your User model
+import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,6 +15,22 @@ export const authOptions: NextAuthOptions = {
     GithubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
+    }),
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials) {
+        await mongoose.connect(process.env.MONGO_URI!); // Connect to MongoDB
+        
+        const user = await User.findOne({ email: credentials?.email });
+        if (user && await bcrypt.compare(credentials?.password!, user.password)) {
+          return { id: user._id.toString(), email: user.email, name: user.name };
+        }
+        return null; // Return null if credentials are invalid
+      },
     }),
   ],
   session: {
@@ -39,10 +57,16 @@ export const authOptions: NextAuthOptions = {
       await mongoose.connect(process.env.MONGO_URI!); // Connect to MongoDB
 
       // Check if the user exists in the database
+      if (account) {
+        if (account.provider === 'credentials') {
+          // Credentials provider handled in authorize function
+          return true;
+        }
+      }
+
       let existingUser = await User.findOne({ email: user.email });
 
       if (!existingUser) {
-        // Create a new user if they don't exist
         await User.create({
           email: user.email!,
           name: user.name || '',
