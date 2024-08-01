@@ -85,6 +85,7 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
   if (error) return <p>{error}</p>;
 
   return (
+    
     <div className="flex flex-col h-[80vh] max-h-[80vh]">
       <div 
         ref={messageContainerRef}
@@ -105,6 +106,7 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
         </button>
       </form>
     </div>
+    
   );
 };
 

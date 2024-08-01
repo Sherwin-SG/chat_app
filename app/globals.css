@@ -1,4 +1,16 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* styles/globals.css */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
+/* Define default light mode colors */
+body {
+  background-color: white;
+  color: black;
+}
+
+/* Define dark mode colors */
+.dark body {
+  background-color: black;
+  color: white;
+}

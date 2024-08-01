@@ -14,6 +14,7 @@ interface FriendsListProps {
 
 const FriendsList: React.FC<FriendsListProps> = ({ friends, selectedFriend, onSelectFriend }) => {
   return (
+    
     <div className="space-y-4">
       {friends.map((friend) => (
         <div
@@ -28,6 +29,7 @@ const FriendsList: React.FC<FriendsListProps> = ({ friends, selectedFriend, onSe
         </div>
       ))}
     </div>
+    
   );
 };
 
