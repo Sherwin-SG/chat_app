@@ -94,13 +94,14 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
         <MessageList messages={messages} currentUserEmail={userEmail} />
       </div>
       <form onSubmit={handleSendMessage} className="flex p-4 border-t border-gray-300 bg-white">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type your message"
-          className="flex-grow p-2 border rounded-lg mr-2"
-        />
+      <input
+  type="text"
+  value={newMessage}
+  onChange={(e) => setNewMessage(e.target.value)}
+  placeholder="Type your message"
+  className="flex-grow p-2 border rounded-lg mr-2 bg-white text-black dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-400 dark:placeholder-gray-500"
+/>
+
         <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
           Send
         </button>

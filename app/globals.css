@@ -3,14 +3,40 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Define default light mode colors */
-body {
-  background-color: white;
-  color: black;
+/* Define custom properties for light and dark mode */
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
 }
 
-/* Define dark mode colors */
-.dark body {
-  background-color: black;
-  color: white;
+.dark {
+  --background-color: #1a1a1a;
+  --text-color: #ffffff;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Ensure other elements also follow dark mode styles */
+.dark .bg-white {
+  background-color: #1a1a1a;
+}
+
+.dark .text-black {
+  color: #ffffff;
+}
+
+.dark .border-gray-300 {
+  border-color: #3a3a3a;
+}
+
+.dark .shadow-md {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Adjustments for specific components if needed */
+.dark .bg-gray-100 {
+  background-color: #2a2a2a;
 }

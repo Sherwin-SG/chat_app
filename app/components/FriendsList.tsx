@@ -20,7 +20,7 @@ const FriendsList: React.FC<FriendsListProps> = ({ friends, selectedFriend, onSe
         <div
           key={friend._id}
           className={`p-4 rounded-lg shadow-md cursor-pointer ${
-            selectedFriend?._id === friend._id ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-100'
+            selectedFriend?._id === friend._id ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-100 dark:hover:bg-gray-700' 
           }`}
           onClick={() => onSelectFriend(friend)}
         >
