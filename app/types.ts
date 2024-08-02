@@ -7,6 +7,7 @@ export interface Friend {
   export interface Message {
     _id: string;
     senderEmail: string;
+    receiverEmail: string;
     recipientId: string;
     text: string;
     createdAt: string;

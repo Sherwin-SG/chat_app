@@ -39,13 +39,20 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
     fetchMessages();
 
     // Listen for new messages
-    socket.on('receiveMessage', (message: Message) => {
-      setMessages(prevMessages => [...prevMessages, message]);
-    });
+    const handleReceiveMessage = (message: Message) => {
+      if (
+        (message.senderEmail === userEmail && message.receiverEmail === friendEmail) ||
+        (message.senderEmail === friendEmail && message.receiverEmail === userEmail)
+      ) {
+        setMessages(prevMessages => [...prevMessages, message]);
+      }
+    };
+
+    socket.on('receiveMessage', handleReceiveMessage);
 
     return () => {
       // Clean up the listener on component unmount
-      socket.off('receiveMessage');
+      socket.off('receiveMessage', handleReceiveMessage);
     };
   }, [userEmail, friendEmail]);
 
@@ -74,7 +81,7 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
     await fetch(`/api/messages/${userEmail}/${friendEmail}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: newMessage }),
+      body: JSON.stringify(message),
     });
 
     // Clear the input field after sending the message
@@ -85,7 +92,6 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
   if (error) return <p>{error}</p>;
 
   return (
-    
     <div className="flex flex-col h-[80vh] max-h-[80vh]">
       <div 
         ref={messageContainerRef}
@@ -94,20 +100,18 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
         <MessageList messages={messages} currentUserEmail={userEmail} />
       </div>
       <form onSubmit={handleSendMessage} className="flex p-4 border-t border-gray-300 bg-white">
-      <input
-  type="text"
-  value={newMessage}
-  onChange={(e) => setNewMessage(e.target.value)}
-  placeholder="Type your message"
-  className="flex-grow p-2 border rounded-lg mr-2 bg-white text-black dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-400 dark:placeholder-gray-500"
-/>
-
+        <input
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Type your message"
+          className="flex-grow p-2 border rounded-lg mr-2 bg-white text-black dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-400 dark:placeholder-gray-500"
+        />
         <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
           Send
         </button>
       </form>
     </div>
-    
   );
 };
 
