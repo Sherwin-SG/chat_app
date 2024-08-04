@@ -5,9 +5,9 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import FriendsList from '../components/FriendsList';
-import ChatWindow from '../components/ChatWindow'; // Renamed from ChatPage
+import GroupsList from '../components/GroupsList';
+import ChatWindow from '../components/ChatWindow';
 import Header from '../components/Header';
-
 
 interface Friend {
   _id: string;
@@ -15,11 +15,18 @@ interface Friend {
   email?: string;
 }
 
+interface Group {
+  _id: string;
+  name: string;
+  members: string[];
+}
+
 const Dashboard: React.FC = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [friends, setFriends] = useState<Friend[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,18 +37,20 @@ const Dashboard: React.FC = () => {
   }, [status, router]);
 
   useEffect(() => {
-    const fetchFriends = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get('/api/friends/list');
-        setFriends(response.data.friends);
+        const friendsResponse = await axios.get('/api/friends/list');
+        const groupsResponse = await axios.get('/api/groups/list');
+        setFriends(friendsResponse.data.friends);
+        setGroups(groupsResponse.data.groups || []);
         setLoading(false);
       } catch (error) {
-        setError('Failed to fetch friends');
+        setError('Failed to fetch data');
         setLoading(false);
       }
     };
 
-    fetchFriends();
+    fetchData();
   }, [session]);
 
   if (status === 'loading') {
@@ -56,7 +65,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/*<Sidebar />*/}
       <div className="flex flex-col flex-1 p-8">
         <Header />
         <main className="flex-1 flex bg-white rounded-lg shadow-md">
@@ -67,11 +75,15 @@ const Dashboard: React.FC = () => {
             ) : error ? (
               <p>{error}</p>
             ) : (
-              <FriendsList 
-                friends={friends} 
-                onSelectFriend={setSelectedFriend} 
-                selectedFriend={selectedFriend} // Pass the selectedFriend prop
-              />
+              <>
+                <FriendsList 
+                  friends={friends} 
+                  onSelectFriend={setSelectedFriend} 
+                  selectedFriend={selectedFriend} 
+                />
+                <h2 className="text-2xl font-bold mt-8">Groups</h2>
+                <GroupsList groups={groups} />
+              </>
             )}
           </div>
           <div className="flex-1 p-4">

@@ -1,14 +1,20 @@
-// components/SettingsMenu.tsx
 'use client';
 
 import { useState } from 'react';
-import DarkModeToggle from './DarkModeTogggle';
+import DarkModeToggle from './DarkModeTogggle'; // Make sure the file name is correct
 import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 import Link from 'next/link'; // Import Link from next/link
 
 const SettingsMenu = () => {
+  const router = useRouter(); // Initialize router
+
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/' });
+  };
+
+  const handleCreateGroup = () => {
+    router.push('/create-group'); // Navigate to the create group page
   };
 
   return (
@@ -26,8 +32,15 @@ const SettingsMenu = () => {
         </Link>
         <DarkModeToggle />
         <button
+        onClick={handleCreateGroup}
+        className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4"
+      >
+        Create Group
+      </button>
+
+        <button
           onClick={handleLogout}
-          className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 mt-2"
         >
           Logout
         </button>
