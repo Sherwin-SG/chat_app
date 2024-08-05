@@ -11,17 +11,10 @@ interface Friend {
   email?: string;
 }
 
-interface Group {
-  _id: string;
-  name: string;
-  members: string[];
-}
-
 const CreateGroup: React.FC = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [friends, setFriends] = useState<Friend[]>([]);
-  const [groups, setGroups] = useState<Group[]>([]); // Ensure this is an array
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [groupName, setGroupName] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -44,23 +37,7 @@ const CreateGroup: React.FC = () => {
       }
     };
 
-    const fetchGroups = async () => {
-      try {
-        const response = await axios.get('/api/groups/list');
-        if (Array.isArray(response.data)) {
-          setGroups(response.data);
-        } else {
-          console.error('Groups data is not an array:', response.data);
-          setError('Unexpected data format for groups');
-        }
-      } catch (error) {
-        console.error('Failed to fetch groups', error);
-        setError('Failed to fetch groups');
-      }
-    };
-
     fetchFriends();
-    fetchGroups();
   }, [session]);
 
   const handleFriendSelect = (friendId: string) => {
@@ -101,53 +78,47 @@ const CreateGroup: React.FC = () => {
   }
 
   return (
-    <div className="p-8">
-      <h2 className="text-2xl font-bold mb-4">Create Group</h2>
+    <div className="p-8 max-w-2xl mx-auto">
+      <h2 className="text-3xl font-bold mb-6">Create Group</h2>
       <input
         type="text"
         value={groupName}
         onChange={(e) => setGroupName(e.target.value)}
         placeholder="Group Name"
-        className="mb-4 p-2 border rounded-lg w-full"
+        className="mb-6 p-3 border rounded-lg w-full text-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-400 dark:placeholder-gray-500"
       />
-      <div className="mb-4">
-        <h3 className="text-xl font-semibold">Select Friends</h3>
-        <ul className="list-disc pl-5">
+      <div className="mb-6">
+        <h3 className="text-2xl font-semibold mb-4">Select Friends</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {friends.map((friend) => (
-            <li key={friend._id}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={selectedFriends.includes(friend._id)}
-                  onChange={() => handleFriendSelect(friend._id)}
-                />
-                {friend.name || friend.email}
-              </label>
-            </li>
+            <div
+              key={friend._id}
+              className={`flex items-center p-4 border rounded-lg shadow-md cursor-pointer ${
+                selectedFriends.includes(friend._id) ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300 bg-gray-200 text-gray-800'
+              }`}
+              onClick={() => handleFriendSelect(friend._id)}
+            >
+              <input
+                type="checkbox"
+                checked={selectedFriends.includes(friend._id)}
+                onChange={() => handleFriendSelect(friend._id)}
+                className="mr-3 h-5 w-5 text-blue-600 focus:ring-0"
+              />
+              <div>
+                <p className="font-medium">{friend.name || friend.email}</p>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
       <button
         onClick={handleCreateGroup}
-        className="bg-blue-500 text-white py-2 px-4 rounded-lg"
+        className="bg-blue-500 text-white py-2 px-6 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
         disabled={loading}
       >
         {loading ? 'Creating...' : 'Create Group'}
       </button>
       {error && <p className="text-red-500 mt-4">{error}</p>}
-
-      {/* Display Groups */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Your Groups</h2>
-        <ul className="list-disc pl-5">
-          {Array.isArray(groups) && groups.map((group) => (
-            <li key={group._id}>
-              <p className="font-semibold">{group.name}</p>
-              <p>Members: {group.members.join(', ')}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };

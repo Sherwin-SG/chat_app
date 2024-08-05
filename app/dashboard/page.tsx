@@ -76,7 +76,7 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-col flex-1 p-8">
         <Header />
         <main className="flex-1 flex bg-white rounded-lg shadow-md">
-          <div className="w-1/3 p-4 border-r border-gray-300">
+          <div className="w-1/3 p-4 border-r border-gray-300 overflow-y-auto max-h-screen">
             <h2 className="text-2xl font-bold">Friends</h2>
             {loading ? (
               <p>Loading friends...</p>
@@ -84,17 +84,21 @@ const Dashboard: React.FC = () => {
               <p>{error}</p>
             ) : (
               <>
-                <FriendsList 
-                  friends={friends} 
-                  onSelectFriend={handleSelectFriend} 
-                  selectedFriend={selectedFriend} 
-                />
+                <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
+                  <FriendsList 
+                    friends={friends} 
+                    onSelectFriend={handleSelectFriend} 
+                    selectedFriend={selectedFriend} 
+                  />
+                </div>
                 <h2 className="text-2xl font-bold mt-8">Groups</h2>
-                <GroupsList 
-                  groups={groups} 
-                  onSelectGroup={handleSelectGroup} 
-                  selectedGroup={selectedGroup} 
-                />
+                <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
+                  <GroupsList 
+                    groups={groups} 
+                    onSelectGroup={handleSelectGroup} 
+                    selectedGroup={selectedGroup} 
+                  />
+                </div>
               </>
             )}
           </div>
