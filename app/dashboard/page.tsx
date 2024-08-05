@@ -7,6 +7,7 @@ import axios from 'axios';
 import FriendsList from '../components/FriendsList';
 import GroupsList from '../components/GroupsList';
 import ChatWindow from '../components/ChatWindow';
+import GroupChatWindow from '../components/GroupChatWindow';
 import Header from '../components/Header';
 
 interface Friend {
@@ -25,6 +26,7 @@ const Dashboard: React.FC = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +65,16 @@ const Dashboard: React.FC = () => {
 
   const userEmail = session?.user?.email;
 
+  const handleSelectFriend = (friend: Friend) => {
+    setSelectedFriend(friend);
+    setSelectedGroup(null);
+  };
+
+  const handleSelectGroup = (group: Group) => {
+    setSelectedGroup(group);
+    setSelectedFriend(null);
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <div className="flex flex-col flex-1 p-8">
@@ -78,19 +90,25 @@ const Dashboard: React.FC = () => {
               <>
                 <FriendsList 
                   friends={friends} 
-                  onSelectFriend={setSelectedFriend} 
+                  onSelectFriend={handleSelectFriend} 
                   selectedFriend={selectedFriend} 
                 />
                 <h2 className="text-2xl font-bold mt-8">Groups</h2>
-                <GroupsList groups={groups} />
+                <GroupsList 
+                  groups={groups} 
+                  onSelectGroup={handleSelectGroup} 
+                  selectedGroup={selectedGroup} 
+                />
               </>
             )}
           </div>
           <div className="flex-1 p-4">
             {selectedFriend ? (
               <ChatWindow friendEmail={selectedFriend.email as string} userEmail={userEmail as string} />
+            ) : selectedGroup ? (
+              <GroupChatWindow group={selectedGroup} userEmail={userEmail as string} />
             ) : (
-              <p>Select a friend to start chatting</p>
+              <p>Select a friend or group to start chatting</p>
             )}
           </div>
         </main>

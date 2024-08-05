@@ -1,4 +1,3 @@
-// components/GroupChatWindow.tsx
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
@@ -10,15 +9,15 @@ interface Group {
 }
 
 interface GroupChatWindowProps {
-  group: Group;  // Ensure only `group` is defined here
+  group: Group;
   userEmail: string;
 }
 
 interface Message {
   _id: string;
   senderEmail: string;
-  content: string;
-  timestamp: string;
+  message: string; // Ensure this matches your schema field name
+  createdAt: string;
 }
 
 const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) => {
@@ -44,7 +43,7 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await axios.get(`/api/groups/messages/${group._id}`);
+        const response = await axios.get(`/api/groups/messages?groupId=${group._id}`);
         setMessages(response.data.messages);
       } catch (error) {
         console.error('Failed to fetch group messages:', error);
@@ -72,6 +71,7 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
       console.error('Failed to send message:', error);
     }
   };
+  
 
   return (
     <div className="flex flex-col h-full">
@@ -79,9 +79,9 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
         {messages.map((message) => (
           <div key={message._id} className="my-2">
             <p>
-              <strong>{message.senderEmail}</strong>: {message.content}
+              <strong>{message.senderEmail}</strong>: {message.message}
             </p>
-            <p className="text-sm text-gray-500">{new Date(message.timestamp).toLocaleString()}</p>
+            <p className="text-sm text-gray-500">{new Date(message.createdAt).toLocaleString()}</p>
           </div>
         ))}
       </div>
