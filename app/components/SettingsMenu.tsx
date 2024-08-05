@@ -33,7 +33,7 @@ const SettingsMenu = () => {
         <DarkModeToggle />
         <button
         onClick={handleCreateGroup}
-        className="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4"
+        className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         Create Group
       </button>

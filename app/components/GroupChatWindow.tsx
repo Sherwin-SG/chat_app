@@ -103,10 +103,10 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
               className={`flex ${message.senderEmail === userEmail ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`p-2 rounded-lg ${
+                className={`p-2 rounded-lg  ${
                   message.senderEmail === userEmail
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-black'
+                    : 'bg-gray-200 text-black dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600'
                 }`}
               >
                 <p className="whitespace-pre-wrap">
