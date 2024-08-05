@@ -1,24 +1,22 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-const GroupMessageSchema = new mongoose.Schema({
-  groupId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Group',
-    required: true,
-  },
-  senderEmail: {
-    type: String,
-    required: true,
-  },
-  message: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+interface IGroupMessage extends Document {
+  groupId: string;
+  senderEmail: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date; // Add updatedAt field to the interface
+}
+
+const GroupMessageSchema: Schema = new Schema({
+  groupId: { type: Schema.Types.ObjectId, ref: 'Group', required: true },
+  senderEmail: { type: String, required: true },
+  content: { type: String, required: true } // Ensure this field is required
+}, {
+  timestamps: true // Automatically add createdAt and updatedAt fields
 });
 
-const GroupMessage = mongoose.models.GroupMessage || mongoose.model('GroupMessage', GroupMessageSchema);
-export default GroupMessage;
+// Check if the model already exists before defining it
+const GroupMessage = mongoose.models.GroupMessage || mongoose.model<IGroupMessage>('GroupMessage', GroupMessageSchema);
+
+export { GroupMessage };

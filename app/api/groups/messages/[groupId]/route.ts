@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '../../../../../lib/dbConnect';
-import GroupMessage from '../../../../../models/GroupMessage';
+import {GroupMessage} from '../../../../../models/GroupMessage';
 
 export async function POST(req: NextRequest) {
   const { groupId, senderEmail, content } = await req.json();

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '../../../../lib/dbConnect';
-import GroupMessage from '../../../../models/GroupMessage';
+import {GroupMessage} from '../../../../models/GroupMessage';
 
 export async function POST(req: NextRequest) {
   const { groupId, senderEmail, content } = await req.json();
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
   try {
     await dbConnect();
-    const message = new GroupMessage({ groupId, senderEmail, message: content }); // Correctly map content to message
+    const message = new GroupMessage({ groupId, senderEmail, content }); // Correctly map content to message
     await message.save();
 
     // Emit the new message via socket.io

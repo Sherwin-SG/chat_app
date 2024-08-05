@@ -1,5 +1,6 @@
 'use client';
 
+// Dashboard.tsx
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -9,17 +10,12 @@ import GroupsList from '../components/GroupsList';
 import ChatWindow from '../components/ChatWindow';
 import GroupChatWindow from '../components/GroupChatWindow';
 import Header from '../components/Header';
+import { Group } from '../types'; // Make sure this path is correct
 
 interface Friend {
   _id: string;
   name?: string;
   email?: string;
-}
-
-interface Group {
-  _id: string;
-  name: string;
-  members: string[];
 }
 
 const Dashboard: React.FC = () => {

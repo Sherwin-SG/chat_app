@@ -12,7 +12,15 @@ export interface Friend {
     text: string;
     createdAt: string;
     content: string;
+    groupId: string;
   }
+ 
+export interface Group {
+  _id: string;
+  name: string;
+  members: string[];
+}
+
 
   export interface ErrorState {
     message: string;
