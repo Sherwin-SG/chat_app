@@ -18,6 +18,7 @@ interface Message {
   senderEmail: string;
   content: string;
   createdAt: string;
+  groupId: string;  // Added groupId to the Message interface
 }
 
 const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) => {
@@ -46,10 +47,14 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
 
     fetchMessages();
 
-    // Listen for incoming messages
-    socketIo.on('receiveMessage', (message: Message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
+    // Handle incoming messages
+    const handleReceiveMessage = (message: Message) => {
+      if (message.groupId === group._id) {
+        setMessages((prevMessages) => [...prevMessages, message]);
+      }
+    };
+
+    socketIo.on('receiveMessage', handleReceiveMessage);
 
     // Cleanup on unmount
     return () => {
@@ -77,12 +82,14 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
     };
 
     try {
+      // Send the message to the database
       await fetch('/api/groups/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(messageData),
       });
 
+      // Emit the message via socket
       socket?.emit('sendMessage', messageData);
 
       setNewMessage('');
