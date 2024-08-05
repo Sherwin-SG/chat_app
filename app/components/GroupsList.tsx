@@ -1,4 +1,3 @@
-// GroupsList.tsx
 import React from 'react';
 import { Group } from '../types'; // Make sure this path is correct
 
@@ -10,14 +9,16 @@ interface GroupsListProps {
 
 const GroupsList: React.FC<GroupsListProps> = ({ groups, onSelectGroup, selectedGroup }) => {
   return (
-    <div>
+    <div className="space-y-4">
       {groups.map((group) => (
         <div
           key={group._id}
           onClick={() => onSelectGroup(group)}
-          className={`p-2 cursor-pointer ${selectedGroup?._id === group._id ? 'bg-blue-100' : ''}`}
+          className={`p-4 rounded-lg shadow-md cursor-pointer ${
+            selectedGroup?._id === group._id ? 'bg-blue-500 text-white' : 'bg-white hover:bg-gray-100 dark:hover:bg-gray-700'
+          }`}
         >
-          {group.name}
+          <p className="font-semibold">{group.name}</p>
         </div>
       ))}
     </div>
