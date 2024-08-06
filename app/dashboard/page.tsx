@@ -76,40 +76,42 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-col flex-1 p-8">
         <Header />
         <main className="flex-1 flex bg-white rounded-lg shadow-md">
-          <div className="w-1/3 p-4 border-r border-gray-300 overflow-y-auto max-h-screen">
+          <div className="w-1/3 p-4 border-r border-gray-300 flex flex-col">
             <h2 className="text-2xl font-bold">Friends</h2>
-            {loading ? (
-              <p>Loading friends...</p>
-            ) : error ? (
-              <p>{error}</p>
-            ) : (
-              <>
-                <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-                  <FriendsList 
-                    friends={friends} 
-                    onSelectFriend={handleSelectFriend} 
-                    selectedFriend={selectedFriend} 
-                  />
-                </div>
-                <h2 className="text-2xl font-bold mt-8">Groups</h2>
-                <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-                  <GroupsList 
-                    groups={groups} 
-                    onSelectGroup={handleSelectGroup} 
-                    selectedGroup={selectedGroup} 
-                  />
-                </div>
-              </>
-            )}
+            <div className="flex-1 overflow-y-auto max-h-[calc(100vh-600px)]">
+              {loading ? (
+                <p>Loading friends...</p>
+              ) : error ? (
+                <p>{error}</p>
+              ) : (
+                <FriendsList 
+                  friends={friends} 
+                  onSelectFriend={handleSelectFriend} 
+                  selectedFriend={selectedFriend} 
+                />
+              )}
+            </div>
+            <div className="mt-8"> 
+            <h2 className="text-2xl font-bold mt-8">Groups</h2>
+            <div className="flex-1 overflow-y-auto max-h-[calc(100vh-600px)]">
+              <GroupsList 
+                groups={groups} 
+                onSelectGroup={handleSelectGroup} 
+                selectedGroup={selectedGroup} 
+              />
+            </div>
           </div>
-          <div className="flex-1 p-4">
-            {selectedFriend ? (
-              <ChatWindow friendEmail={selectedFriend.email as string} userEmail={userEmail as string} />
-            ) : selectedGroup ? (
-              <GroupChatWindow group={selectedGroup} userEmail={userEmail as string} />
-            ) : (
-              <p>Select a friend or group to start chatting</p>
-            )}
+          </div>
+          <div className="flex-1 flex flex-col">
+            <div className="flex-1 p-4 overflow-auto">
+              {selectedFriend ? (
+                <ChatWindow friendEmail={selectedFriend.email as string} userEmail={userEmail as string} />
+              ) : selectedGroup ? (
+                <GroupChatWindow group={selectedGroup} userEmail={userEmail as string} />
+              ) : (
+                <p>Select a friend or group to start chatting</p>
+              )}
+            </div>
           </div>
         </main>
       </div>
