@@ -19,6 +19,7 @@ const CreateGroup: React.FC = () => {
   const [groupName, setGroupName] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null); // New state for userId
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -40,6 +41,23 @@ const CreateGroup: React.FC = () => {
     fetchFriends();
   }, [session]);
 
+  useEffect(() => {
+    const fetchUserId = async () => {
+      if (!session?.user?.email) return;
+      try {
+        const response = await axios.get('/api/users/getIdByEmail', {
+          params: { email: session.user.email }
+        });
+        setUserId(response.data.id);
+      } catch (error) {
+        console.error('Failed to fetch user ID', error);
+        setError('Failed to fetch user ID');
+      }
+    };
+
+    fetchUserId();
+  }, [session]);
+
   const handleFriendSelect = (friendId: string) => {
     setSelectedFriends((prevSelected) => {
       if (prevSelected.includes(friendId)) {
@@ -51,12 +69,17 @@ const CreateGroup: React.FC = () => {
   };
 
   const handleCreateGroup = async () => {
+    if (!userId) {
+      setError('User ID is required');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
       const response = await axios.post('/api/groups/create', {
         name: groupName,
-        members: selectedFriends,
+        members: [userId, ...selectedFriends],
       });
       if (response.status === 201) {
         router.push('/dashboard');

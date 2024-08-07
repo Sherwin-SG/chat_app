@@ -10,7 +10,8 @@ interface Group {
 
 interface GroupChatWindowProps {
   group: Group;
-  userEmail: string;
+  userEmail: string; // Add this prop
+  userId: string; // Add this prop
 }
 
 interface Message {
