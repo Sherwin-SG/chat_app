@@ -1,5 +1,3 @@
-// Dashboard.tsx
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -11,7 +9,7 @@ import GroupsList from '../components/GroupsList';
 import ChatWindow from '../components/ChatWindow';
 import GroupChatWindow from '../components/GroupChatWindow';
 import Header from '../components/Header';
-import { Group } from '../types'; // Make sure this path is correct
+import { Group } from '../types'; // Ensure this path is correct
 
 interface Friend {
   _id: string;
@@ -26,7 +24,9 @@ const Dashboard: React.FC = () => {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingFriends, setLoadingFriends] = useState(true);
+  const [loadingGroups, setLoadingGroups] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,31 +36,59 @@ const Dashboard: React.FC = () => {
   }, [status, router]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const friendsResponse = await axios.get('/api/friends/list');
-        const groupsResponse = await axios.get('/api/groups/list');
-        setFriends(friendsResponse.data.friends);
-        setGroups(groupsResponse.data.groups || []);
-        setLoading(false);
-      } catch (error) {
-        setError('Failed to fetch data');
-        setLoading(false);
+    const fetchUserId = async () => {
+      if (session?.user?.email) {
+        try {
+          const response = await axios.get('/api/users/getIdByEmail', {
+            params: { email: session.user.email },
+          });
+          setUserId(response.data.id);
+        } catch (error) {
+          console.error('Failed to fetch user ID:', error);
+        }
       }
     };
 
-    fetchData();
+    fetchUserId();
   }, [session]);
 
-  // Function to refetch groups list after leaving a group
-  const fetchGroups = async () => {
-    try {
-      const response = await axios.get('/api/groups/list');
-      setGroups(response.data.groups || []);
-    } catch (error) {
-      setError('Failed to fetch groups');
-    }
-  };
+  useEffect(() => {
+    const fetchFriends = async () => {
+      if (userId) {
+        try {
+          const friendsResponse = await axios.get('/api/friends/list');
+          setFriends(friendsResponse.data.friends);
+          setLoadingFriends(false);
+        } catch (error) {
+          console.error('Failed to fetch friends:', error);
+          setError('Failed to fetch friends');
+          setLoadingFriends(false);
+        }
+      }
+    };
+
+    fetchFriends();
+  }, [userId]);
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      if (userId) {
+        try {
+          const groupsResponse = await axios.get('/api/groups/list', {
+            params: { userId },
+          });
+          setGroups(groupsResponse.data.groups || []);
+          setLoadingGroups(false);
+        } catch (error) {
+          console.error('Failed to fetch groups:', error);
+          setError('Failed to fetch groups');
+          setLoadingGroups(false);
+        }
+      }
+    };
+
+    fetchGroups();
+  }, [userId]);
 
   const handleSelectFriend = (friend: Friend) => {
     setSelectedFriend(friend);
@@ -86,8 +114,6 @@ const Dashboard: React.FC = () => {
       console.error('Failed to leave group', error);
     }
   };
-  
-  
 
   if (status === 'loading') {
     return <p>Loading...</p>;
@@ -97,7 +123,6 @@ const Dashboard: React.FC = () => {
     return null;
   }
 
-  const userId = session.user.id; // Assuming userId is available on session.user
   const userEmail = session.user.email; // Assuming userEmail is available on session.user
 
   return (
@@ -108,7 +133,7 @@ const Dashboard: React.FC = () => {
           <div className="w-1/3 p-4 border-r border-gray-300 flex flex-col">
             <h2 className="text-2xl font-bold">Friends</h2>
             <div className="flex-1 overflow-y-auto max-h-[calc(100vh-650px)]">
-              {loading ? (
+              {loadingFriends ? (
                 <p>Loading friends...</p>
               ) : error ? (
                 <p>{error}</p>
@@ -120,25 +145,31 @@ const Dashboard: React.FC = () => {
                 />
               )}
             </div>
-            <div className="mt-8"> 
-  <h2 className="text-2xl font-bold mt-8">Groups</h2>
-  <div className="flex-1 overflow-y-auto max-h-[calc(100vh-600px)]">
-    <GroupsList 
-      groups={groups} 
-      onSelectGroup={handleSelectGroup} 
-      selectedGroup={selectedGroup} 
-onLeaveGroup={handleLeaveGroup} // Pass the function as a prop
-
-    />
-  </div>
-</div>
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold mt-8">Groups</h2>
+              <div className="flex-1 overflow-y-auto max-h-[calc(100vh-600px)]">
+                {loadingGroups ? (
+                  <p>Loading groups...</p>
+                ) : error ? (
+                  <p>{error}</p>
+                ) : (
+                  <GroupsList 
+                    groups={groups} 
+                    onSelectGroup={handleSelectGroup} 
+                    selectedGroup={selectedGroup} 
+                    onLeaveGroup={handleLeaveGroup} // Pass the function as a prop
+                    userId={userId || ''} // Pass the userId to GroupsList
+                  />
+                )}
+              </div>
+            </div>
           </div>
           <div className="flex-1 flex flex-col">
             <div className="flex-1 p-4 overflow-auto">
               {selectedFriend ? (
                 <ChatWindow friendEmail={selectedFriend.email!} userEmail={userEmail} />
               ) : selectedGroup ? (
-                <GroupChatWindow group={selectedGroup} userId={userId} userEmail={userEmail} />
+                <GroupChatWindow group={selectedGroup} userId={userId!} userEmail={userEmail} />
               ) : (
                 <p>Select a friend or group to start chatting</p>
               )}

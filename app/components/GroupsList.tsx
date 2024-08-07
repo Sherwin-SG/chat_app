@@ -1,20 +1,24 @@
 import React from 'react';
-import { Group } from '../types'; // Make sure this path is correct
+import { Group } from '../types'; // Ensure this path is correct
 
 interface GroupsListProps {
   groups: Group[];
   onSelectGroup: (group: Group) => void;
   selectedGroup: Group | null;
   onLeaveGroup: (groupId: string) => void;
+  userId: string; // Add userId prop
 }
 
-const GroupsList: React.FC<GroupsListProps> = ({ groups = [], onSelectGroup, selectedGroup, onLeaveGroup }) => {
+const GroupsList: React.FC<GroupsListProps> = ({ groups, onSelectGroup, selectedGroup, onLeaveGroup, userId }) => {
+  // Filter groups to only show those where the user is a member
+  const filteredGroups = groups.filter(group => group.members.includes(userId));
+
   return (
     <div className="space-y-4">
-      {groups.length === 0 ? (
+      {filteredGroups.length === 0 ? (
         <p>No groups available</p>
       ) : (
-        groups.map((group) => (
+        filteredGroups.map((group) => (
           <div
             key={group._id}
             className={`p-4 rounded-lg shadow-md cursor-pointer ${
@@ -27,7 +31,7 @@ const GroupsList: React.FC<GroupsListProps> = ({ groups = [], onSelectGroup, sel
               <button 
                 className="ml-2 text-red-500"
                 onClick={(e) => {
-                  e.stopPropagation();
+                  e.stopPropagation(); // Prevent triggering the onClick for the entire group
                   onLeaveGroup(group._id);
                 }}
               >
