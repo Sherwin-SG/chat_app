@@ -5,13 +5,13 @@ import axios from 'axios';
 interface Group {
   _id: string;
   name: string;
-  members: string[];
+  members: string[]; // memberIds
 }
 
 interface GroupChatWindowProps {
   group: Group;
-  userEmail: string; // Add this prop
-  userId: string; // Add this prop
+  userEmail: string;
+  userId: string;
 }
 
 interface Message {
@@ -19,13 +19,15 @@ interface Message {
   senderEmail: string;
   content: string;
   createdAt: string;
-  groupId: string;  // Added groupId to the Message interface
+  groupId: string;
 }
 
 const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [showMembers, setShowMembers] = useState(false);
+  const [memberEmails, setMemberEmails] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,7 +41,6 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
     const fetchMessages = async () => {
       try {
         const response = await axios.get(`/api/groups/messages?groupId=${group._id}`);
-        console.log('Fetched Messages:', response.data.messages);
         setMessages(response.data.messages);
       } catch (error) {
         console.error('Failed to fetch group messages:', error);
@@ -47,6 +48,18 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
     };
 
     fetchMessages();
+
+    // Fetch group member emails
+    const fetchGroupMembers = async () => {
+      try {
+        const response = await axios.post('/api/groups/members', { memberIds: group.members });
+        setMemberEmails(response.data.memberEmails);
+      } catch (error) {
+        console.error('Failed to fetch group member emails:', error);
+      }
+    };
+
+    fetchGroupMembers();
 
     // Handle incoming messages
     const handleReceiveMessage = (message: Message) => {
@@ -83,14 +96,12 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
     };
 
     try {
-      // Send the message to the database
       await fetch('/api/groups/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(messageData),
       });
 
-      // Emit the message via socket
       socket?.emit('sendMessage', messageData);
 
       setNewMessage('');
@@ -101,6 +112,31 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
 
   return (
     <div className="flex flex-col h-[80vh] max-h-[80vh]">
+      {/* Header with Group Name */}
+      <div className="bg-gray-100 p-4 border-b border-gray-300">
+        <h2
+          className="text-lg font-bold cursor-pointer"
+          onClick={() => setShowMembers(!showMembers)}
+        >
+          {group.name}
+        </h2>
+        {showMembers && (
+          <div className="mt-2">
+            <h3 className="text-sm font-semibold">Members:</h3>
+            <ul className="list-disc list-inside">
+              {memberEmails.length === 0 ? (
+                <li>No members</li>
+              ) : (
+                memberEmails.map((email) => (
+                  <li key={email}>{email}</li>
+                ))
+              )}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {/* Messages */}
       <div className="flex-grow overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
           <p>No messages to display</p>

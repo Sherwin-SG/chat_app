@@ -27,7 +27,7 @@ const AddFriendButton = () => {
         value={friendEmail}
         onChange={(e) => setFriendEmail(e.target.value)}
         placeholder="Enter friend's email"
-        className="w-full max-w-md px-4 py-2 mb-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
+        className="w-full max-w-md px-4 py-2 mb-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white text-black dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 placeholder-gray-400 dark:placeholder-gray-500"
       />
       <button
         onClick={addFriend}
