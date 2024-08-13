@@ -5,13 +5,13 @@ import axios from 'axios';
 interface Group {
   _id: string;
   name: string;
+  description: string;
   members: string[]; // memberIds
 }
 
 interface GroupChatWindowProps {
   group: Group;
   userEmail: string;
-  userId: string;
 }
 
 interface Message {
@@ -26,7 +26,8 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [showMembers, setShowMembers] = useState(false);
+  const [showMembersAndDescription, setShowMembersAndDescription] = useState(false);
+  const [description, setDescription] = useState(group.description);
   const [memberEmails, setMemberEmails] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -110,25 +111,46 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
     }
   };
 
+  const handleUpdateDescription = async () => {
+    try {
+      await axios.put(`/api/groups/${group._id}/description`, { description });
+    } catch (error) {
+      console.error('Failed to update description:', error);
+    }
+  };
+
   return (
     <div className="flex flex-col h-[80vh] max-h-[80vh]">
       {/* Header with Group Name */}
-      <div className="bg-gray-100 p-4 border-b border-gray-300">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
         <h2
-          className="text-lg font-bold cursor-pointer"
-          onClick={() => setShowMembers(!showMembers)}
+          className="text-xl font-semibold text-gray-800 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer transition-colors duration-200"
+          onClick={() => setShowMembersAndDescription(!showMembersAndDescription)}
         >
           {group.name}
         </h2>
-        {showMembers && (
-          <div className="mt-2">
-            <h3 className="text-sm font-semibold">Members:</h3>
-            <ul className="list-disc list-inside">
+        {showMembersAndDescription && (
+          <div className="mt-4">
+            {/* Description Section */}
+            <div className="mb-4">
+              <textarea
+                className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                onBlur={handleUpdateDescription}
+              />
+            </div>
+
+            {/* Members Section */}
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Members:</h3>
+            <ul className="list-inside list-disc space-y-1 text-gray-600 dark:text-gray-400">
               {memberEmails.length === 0 ? (
-                <li>No members</li>
+                <li className="italic text-gray-500 dark:text-gray-500">No members</li>
               ) : (
                 memberEmails.map((email) => (
-                  <li key={email}>{email}</li>
+                  <li key={email} className="text-sm">
+                    {email}
+                  </li>
                 ))
               )}
             </ul>
@@ -147,7 +169,7 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
               className={`flex ${message.senderEmail === userEmail ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`p-3 rounded-lg max-w-xs  ${
+                className={`p-3 rounded-lg max-w-xs ${
                   message.senderEmail === userEmail
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-200 text-gray-800'
