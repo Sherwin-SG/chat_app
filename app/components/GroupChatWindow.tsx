@@ -5,8 +5,8 @@ import axios from 'axios';
 interface Group {
   _id: string;
   name: string;
-  description: string;
   members: string[]; // memberIds
+  description?: string; // Optional description field
 }
 
 interface GroupChatWindowProps {
@@ -26,19 +26,37 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [showMembersAndDescription, setShowMembersAndDescription] = useState(false);
-  const [description, setDescription] = useState(group.description);
+  const [showDetails, setShowDetails] = useState(false);
   const [memberEmails, setMemberEmails] = useState<string[]>([]);
+  const [description, setDescription] = useState(group.description || '');
+  const [editingDescription, setEditingDescription] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Function to handle received messages
+  const handleReceiveMessage = (message: Message) => {
+    console.log('Received message:', message); // Debug log
+    if (message.groupId === group._id) {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    }
+  };
 
   useEffect(() => {
     // Initialize socket connection
     const socketIo = io();
-
-    // Set the socket connection
     setSocket(socketIo);
 
-    // Fetch initial messages
+    // Setup socket listeners
+    socketIo.on('receiveMessage', handleReceiveMessage);
+
+    // Cleanup on unmount
+    return () => {
+      socketIo.off('receiveMessage', handleReceiveMessage);
+      socketIo.disconnect();
+    };
+  }, [group._id]); // Only reinitialize socket connection when group._id changes
+
+  useEffect(() => {
+    // Fetch messages when the group changes
     const fetchMessages = async () => {
       try {
         const response = await axios.get(`/api/groups/messages?groupId=${group._id}`);
@@ -62,20 +80,10 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
 
     fetchGroupMembers();
 
-    // Handle incoming messages
-    const handleReceiveMessage = (message: Message) => {
-      if (message.groupId === group._id) {
-        setMessages((prevMessages) => [...prevMessages, message]);
-      }
-    };
-
-    socketIo.on('receiveMessage', handleReceiveMessage);
-
-    // Cleanup on unmount
-    return () => {
-      socketIo.disconnect();
-    };
-  }, [group._id]);
+    // Reset description and edit state when the group changes
+    setDescription(group.description || '');
+    setEditingDescription(false);
+  }, [group._id, group.description, group.members]);
 
   useEffect(() => {
     // Scroll to the bottom whenever messages change
@@ -111,9 +119,13 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
     }
   };
 
-  const handleUpdateDescription = async () => {
+  const handleDescriptionUpdate = async () => {
     try {
-      await axios.put(`/api/groups/${group._id}/description`, { description });
+      await fetch(`/api/groups/${group._id}/description`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description }),
+      });
     } catch (error) {
       console.error('Failed to update description:', error);
     }
@@ -125,35 +137,57 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
         <h2
           className="text-xl font-semibold text-gray-800 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer transition-colors duration-200"
-          onClick={() => setShowMembersAndDescription(!showMembersAndDescription)}
+          onClick={() => setShowDetails(!showDetails)}
         >
           {group.name}
         </h2>
-        {showMembersAndDescription && (
-          <div className="mt-4">
-            {/* Description Section */}
-            <div className="mb-4">
-              <textarea
-                className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                onBlur={handleUpdateDescription}
-              />
+        {showDetails && (
+          <div className="mt-2">
+            {editingDescription ? (
+              <div>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                />
+                <button
+                  onClick={handleDescriptionUpdate}
+                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setEditingDescription(false)}
+                  className="mt-2 ml-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div>
+                <p className="text-gray-700 dark:text-gray-300">{description || 'No description'}</p>
+                <button
+                  onClick={() => setEditingDescription(true)}
+                  className="mt-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                >
+                  Edit Description
+                </button>
+              </div>
+            )}
+            <div className="mt-2">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Members:</h3>
+              <ul className="list-inside list-disc space-y-1 text-gray-600 dark:text-gray-400">
+                {memberEmails.length === 0 ? (
+                  <li className="italic text-gray-500 dark:text-gray-500">No members</li>
+                ) : (
+                  memberEmails.map((email) => (
+                    <li key={email} className="text-sm">
+                      {email}
+                    </li>
+                  ))
+                )}
+              </ul>
             </div>
-
-            {/* Members Section */}
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Members:</h3>
-            <ul className="list-inside list-disc space-y-1 text-gray-600 dark:text-gray-400">
-              {memberEmails.length === 0 ? (
-                <li className="italic text-gray-500 dark:text-gray-500">No members</li>
-              ) : (
-                memberEmails.map((email) => (
-                  <li key={email} className="text-sm">
-                    {email}
-                  </li>
-                ))
-              )}
-            </ul>
           </div>
         )}
       </div>
@@ -187,7 +221,7 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
         )}
         <div ref={messagesEndRef} />
       </div>
-      <form onSubmit={handleSendMessage} className="flex p-4 border-t border-gray-300 bg-white">
+      <form onSubmit={handleSendMessage} className="flex p-4 border-t border-gray-300 bg-white dark:bg-gray-800">
         <input
           type="text"
           value={newMessage}
