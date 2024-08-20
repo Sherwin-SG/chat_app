@@ -5,18 +5,18 @@ interface IGroupMessage extends Document {
   senderEmail: string;
   content: string;
   createdAt: Date;
-  updatedAt: Date; // Add updatedAt field to the interface
+  updatedAt: Date; 
 }
 
 const GroupMessageSchema: Schema = new Schema({
   groupId: { type: Schema.Types.ObjectId, ref: 'Group', required: true },
   senderEmail: { type: String, required: true },
-  content: { type: String, required: true } // Ensure this field is required
+  content: { type: String, required: true } 
 }, {
-  timestamps: true // Automatically add createdAt and updatedAt fields
+  timestamps: true 
 });
 
-// Check if the model already exists before defining it
+
 const GroupMessage = mongoose.models.GroupMessage || mongoose.model<IGroupMessage>('GroupMessage', GroupMessageSchema);
 
 export { GroupMessage };

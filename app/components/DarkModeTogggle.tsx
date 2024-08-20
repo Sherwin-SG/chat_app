@@ -1,4 +1,4 @@
-// components/DarkModeToggle.tsx
+ 
 'use client';
 import { useState, useEffect } from 'react';
 
@@ -6,7 +6,7 @@ const DarkModeToggle = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    // Check if dark mode preference is saved in localStorage
+     
     const savedMode = localStorage.getItem('darkMode') === 'true';
     setIsDarkMode(savedMode);
     if (savedMode) {

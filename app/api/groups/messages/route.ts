@@ -5,7 +5,7 @@ import {GroupMessage} from '../../../../models/GroupMessage';
 export async function POST(req: NextRequest) {
   const { groupId, senderEmail, content } = await req.json();
 
-  console.log('Received message data:', { groupId, senderEmail, content }); // Add this line
+  console.log('Received message data:', { groupId, senderEmail, content });  
 
   if (!groupId || !senderEmail || !content) {
     return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
@@ -13,10 +13,10 @@ export async function POST(req: NextRequest) {
 
   try {
     await dbConnect();
-    const message = new GroupMessage({ groupId, senderEmail, content }); // Correctly map content to message
+    const message = new GroupMessage({ groupId, senderEmail, content });  
     await message.save();
 
-    // Emit the new message via socket.io
+    
     const io = require('socket.io')(process.env.SOCKET_SERVER_PORT);
     io.to(groupId).emit('group-message', message);
 

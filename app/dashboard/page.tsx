@@ -9,12 +9,13 @@ import GroupsList from '../components/GroupsList';
 import ChatWindow from '../components/ChatWindow';
 import GroupChatWindow from '../components/GroupChatWindow';
 import Header from '../components/Header';
-import { Group } from '../types'; // Ensure this path is correct
+import { Group } from '../types'; 
 
 interface Friend {
   _id: string;
   name?: string;
   email?: string;
+  profilePic: string | null;
 }
 
 const Dashboard: React.FC = () => {
@@ -123,7 +124,7 @@ const Dashboard: React.FC = () => {
     return null;
   }
 
-  const userEmail = session.user.email; // Assuming userEmail is available on session.user
+  const userEmail = session.user.email; 
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -157,8 +158,8 @@ const Dashboard: React.FC = () => {
                     groups={groups} 
                     onSelectGroup={handleSelectGroup} 
                     selectedGroup={selectedGroup} 
-                    onLeaveGroup={handleLeaveGroup} // Pass the function as a prop
-                    userId={userId || ''} // Pass the userId to GroupsList
+                    onLeaveGroup={handleLeaveGroup} 
+                    userId={userId || ''} 
                   />
                 )}
               </div>

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import dbConnect from '../../../../lib/dbConnect'; // Adjust path if needed
-import User from '../../../../models/User'; // Adjust path if needed
+import dbConnect from '../../../../lib/dbConnect';  
+import User from '../../../../models/User';  
 
 // Fetch user ID by email
 export async function GET(request: Request) {
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   await dbConnect();
 
   try {
-    const user = await User.findOne({ email }).select('_id'); // Ensure _id is returned
+    const user = await User.findOne({ email }).select('_id');  
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Message from '../../../models/Message';
-import User from '../../../models/User'; // Add import if not already present
+import User from '../../../models/User'; 
 import dbConnect from '../../../lib/dbConnect';
 
 export const POST = async (req: NextApiRequest, res: NextApiResponse) => {

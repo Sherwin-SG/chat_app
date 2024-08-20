@@ -16,15 +16,15 @@ export default function Login() {
     setError('');
 
     try {
-      // Send login request to your custom API
+       
       const response = await axios.post('/api/login', { email, password });
       
       if (response.status === 200) {
-        // Assuming you get a token from the response
+         
         const { token } = response.data;
-        localStorage.setItem('token', token); // Store token in localStorage
+        localStorage.setItem('token', token);  
         
-        // Sign in with NextAuth to manage the session
+         
         const result = await signIn('credentials', {
           redirect: false,
           email,

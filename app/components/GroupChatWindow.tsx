@@ -5,13 +5,14 @@ import axios from 'axios';
 interface Group {
   _id: string;
   name: string;
-  members: string[]; // memberIds
-  description?: string; // Optional description field
+  members: string[]; 
+  description?: string;  
 }
 
 interface GroupChatWindowProps {
   group: Group;
   userEmail: string;
+  userId: string;  
 }
 
 interface Message {
@@ -22,7 +23,7 @@ interface Message {
   groupId: string;
 }
 
-const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) => {
+const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group,userId,userEmail }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -32,31 +33,31 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
   const [editingDescription, setEditingDescription] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Function to handle received messages
+   
   const handleReceiveMessage = (message: Message) => {
-    console.log('Received message:', message); // Debug log
+    console.log('Received message:', message);  
     if (message.groupId === group._id) {
       setMessages((prevMessages) => [...prevMessages, message]);
     }
   };
 
   useEffect(() => {
-    // Initialize socket connection
+     
     const socketIo = io();
     setSocket(socketIo);
 
-    // Setup socket listeners
+    
     socketIo.on('receiveMessage', handleReceiveMessage);
 
-    // Cleanup on unmount
+     
     return () => {
       socketIo.off('receiveMessage', handleReceiveMessage);
       socketIo.disconnect();
     };
-  }, [group._id]); // Only reinitialize socket connection when group._id changes
+  }, [group._id]);  
 
   useEffect(() => {
-    // Fetch messages when the group changes
+     
     const fetchMessages = async () => {
       try {
         const response = await axios.get(`/api/groups/messages?groupId=${group._id}`);
@@ -68,7 +69,7 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
 
     fetchMessages();
 
-    // Fetch group member emails
+     
     const fetchGroupMembers = async () => {
       try {
         const response = await axios.post('/api/groups/members', { memberIds: group.members });
@@ -80,13 +81,13 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userEmail }) =
 
     fetchGroupMembers();
 
-    // Reset description and edit state when the group changes
+     
     setDescription(group.description || '');
     setEditingDescription(false);
   }, [group._id, group.description, group.members]);
 
   useEffect(() => {
-    // Scroll to the bottom whenever messages change
+     
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }

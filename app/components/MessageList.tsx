@@ -1,4 +1,4 @@
-// app/components/MessageList.tsx
+ 
 
 import React from 'react';
 
@@ -10,7 +10,7 @@ interface Message {
 
 interface MessageListProps {
   messages: Message[];
-  currentUserEmail: string; // Add currentUserEmail as a prop
+  currentUserEmail: string;  
 }
 
 const MessageList: React.FC<MessageListProps> = ({ messages, currentUserEmail }) => {

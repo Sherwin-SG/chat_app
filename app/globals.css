@@ -1,9 +1,9 @@
-/* styles/globals.css */
+ 
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Define custom properties for light and dark mode */
+ 
 :root {
   --background-color: #ffffff;
   --text-color: #000000;
@@ -19,7 +19,7 @@ body {
   color: var(--text-color);
 }
 
-/* Ensure other elements also follow dark mode styles */
+ 
 .dark .bg-white {
   background-color: #1a1a1a;
 }
@@ -36,7 +36,7 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Adjustments for specific components if needed */
+ 
 .dark .bg-gray-100 {
   background-color: #2a2a2a;
 }

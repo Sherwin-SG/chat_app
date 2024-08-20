@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '../../../../lib/dbConnect';
-import Group from '../../../../models/Groups'; // Ensure the path is correct
+import Group from '../../../../models/Groups';  
 
 export async function GET(req: NextRequest) {
   try {
-    await dbConnect(); // Ensure you connect to the database
+    await dbConnect(); 
 
     const groups = await Group.find({});
     return NextResponse.json({ groups });

@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 import MessageList from '../../components/MessageList';
 import MessageInput from '../../components/MessageInput';
 
-const socket = io('http://localhost:3000'); // Initialize socket connection
+const socket = io('http://localhost:3000'); 
 
 interface Message {
   content: string;

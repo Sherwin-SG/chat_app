@@ -3,7 +3,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from 'next-auth/providers/github';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import mongoose from 'mongoose';
-import User from '@/models/User'; // Adjust the path to your User model
+import User from '@/models/User'; 
 import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
@@ -23,18 +23,18 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        await mongoose.connect(process.env.MONGO_URI!); // Connect to MongoDB
+        await mongoose.connect(process.env.MONGO_URI!); 
         
         const user = await User.findOne({ email: credentials?.email });
         if (user && await bcrypt.compare(credentials?.password!, user.password)) {
           return { id: user._id.toString(), email: user.email, name: user.name };
         }
-        return null; // Return null if credentials are invalid
+        return null; 
       },
     }),
   ],
   session: {
-    strategy: 'jwt', // Use JWT for session strategy
+    strategy: 'jwt', 
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -54,12 +54,12 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async signIn({ user, account }) {
-      await mongoose.connect(process.env.MONGO_URI!); // Connect to MongoDB
+      await mongoose.connect(process.env.MONGO_URI!); 
 
-      // Check if the user exists in the database
+       
       if (account) {
         if (account.provider === 'credentials') {
-          // Credentials provider handled in authorize function
+           
           return true;
         }
       }
@@ -70,23 +70,22 @@ export const authOptions: NextAuthOptions = {
         await User.create({
           email: user.email!,
           name: user.name || '',
-          friends: [], // Initialize with an empty array if needed
-          // No password needed for OAuth users
+          friends: [],  
         });
       }
 
       return true;
     },
     async redirect({ url, baseUrl }) {
-      // Redirect to the dashboard after successful login
+       
       if (url.startsWith(baseUrl)) {
-        return `${baseUrl}/dashboard`; // Redirect to the dashboard
+        return `${baseUrl}/dashboard`;  
       }
       return baseUrl;
     },
   },
   pages: {
-    signIn: '/login', // Redirect to your custom login page
+    signIn: '/login',  
   },
 };
 

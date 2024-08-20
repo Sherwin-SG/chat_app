@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
-import Message from '@/models/Message'; // Ensure this path is correct
+import Message from '@/models/Message';  
 
 const connectToDatabase = async () => {
   if (mongoose.connection.readyState === 0) {

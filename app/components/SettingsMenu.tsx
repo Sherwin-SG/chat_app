@@ -1,20 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import DarkModeToggle from './DarkModeTogggle'; // Make sure the file name is correct
+import DarkModeToggle from './DarkModeTogggle';  
 import { signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation'; // Import useRouter for navigation
-import Link from 'next/link'; // Import Link from next/link
+import { useRouter } from 'next/navigation';  
+import Link from 'next/link';  
 
 const SettingsMenu = () => {
-  const router = useRouter(); // Initialize router
+  const router = useRouter(); 
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/' });
   };
 
   const handleCreateGroup = () => {
-    router.push('/create-group'); // Navigate to the create group page
+    router.push('/create-group');  
   };
 
   return (

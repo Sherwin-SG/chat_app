@@ -4,7 +4,7 @@ interface Friend {
   _id: string;
   name?: string;
   email?: string;
-  profilePic: string | null; // URL to the profile picture or null for default
+  profilePic: string | null;  
 }
 
 interface FriendsListProps {
@@ -14,7 +14,7 @@ interface FriendsListProps {
 }
 
 const FriendsList: React.FC<FriendsListProps> = ({
-  friends = [], // Default value to empty array
+  friends = [],  
   selectedFriend,
   onSelectFriend
 }) => {

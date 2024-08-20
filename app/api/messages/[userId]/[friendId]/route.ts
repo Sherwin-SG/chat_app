@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import mongoose from 'mongoose';
-import Message from '@/models/Message'; // Ensure this path is correct
+import Message from '@/models/Message';
 import { getToken } from 'next-auth/jwt';
 
 const connectToDatabase = async () => {
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
       senderEmail: params.userId,
       receiverEmail: params.friendId,
       content,
-      status: 'sent', // Set initial status
+      status: 'sent',  
       createdAt: new Date()
     });
 

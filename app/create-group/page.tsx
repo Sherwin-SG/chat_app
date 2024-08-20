@@ -19,7 +19,7 @@ const CreateGroup: React.FC = () => {
   const [groupName, setGroupName] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null); // New state for userId
+  const [userId, setUserId] = useState<string | null>(null);  
 
   useEffect(() => {
     if (status === 'unauthenticated') {

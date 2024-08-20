@@ -6,21 +6,12 @@ const Header = () => {
   const { data: session, status } = useSession();
   const [profilePic, setProfilePic] = useState<string | null>(null);
 
-  // Load profile picture from localStorage on component mount
-  useEffect(() => {
-    const storedProfilePic = localStorage.getItem('profilePic');
-    if (storedProfilePic) {
-      setProfilePic(storedProfilePic);
-    }
-  }, []);
-
   const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (event) => {
         const imgDataUrl = event.target?.result as string;
         setProfilePic(imgDataUrl);
-        localStorage.setItem('profilePic', imgDataUrl); // Save to localStorage
       };
       reader.readAsDataURL(e.target.files[0]);
     }

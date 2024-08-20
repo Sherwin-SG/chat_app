@@ -1,16 +1,16 @@
 import React from 'react';
-import { Group } from '../types'; // Ensure this path is correct
+import { Group } from '../types';  
 
 interface GroupsListProps {
   groups: Group[];
   onSelectGroup: (group: Group) => void;
   selectedGroup: Group | null;
   onLeaveGroup: (groupId: string) => void;
-  userId: string; // Add userId prop
+  userId: string;  
 }
 
 const GroupsList: React.FC<GroupsListProps> = ({ groups, onSelectGroup, selectedGroup, onLeaveGroup, userId }) => {
-  // Filter groups to only show those where the user is a member
+ 
   const filteredGroups = groups.filter(group => group.members.includes(userId));
 
   return (
@@ -31,7 +31,7 @@ const GroupsList: React.FC<GroupsListProps> = ({ groups, onSelectGroup, selected
               <button 
                 className="ml-2 text-red-500"
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent triggering the onClick for the entire group
+                  e.stopPropagation();  
                   onLeaveGroup(group._id);
                 }}
               >

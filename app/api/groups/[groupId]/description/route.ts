@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   await dbConnect();
 
   const { pathname } = req.nextUrl;
-  const groupId = pathname.split('/')[3]; // Extract groupId from the URL
+  const groupId = pathname.split('/')[3];  
   const { description } = await req.json();
 
   if (!description) {

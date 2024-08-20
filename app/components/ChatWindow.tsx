@@ -26,12 +26,12 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
           setMessages(data);
         } else {
           console.error('Invalid data format:', data);
-          setMessages([]); // Set to empty array if data is not valid
+          setMessages([]);  
         }
         setLoading(false);
       } catch (error) {
         console.error('Error fetching messages:', error);
-        setMessages([]); // Set to empty array in case of an error
+        setMessages([]);  
         setLoading(false);
       }
     };
@@ -51,13 +51,13 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
     socket.on('receiveMessage', handleReceiveMessage);
 
     return () => {
-      // Clean up the listener on component unmount
+       
       socket.off('receiveMessage', handleReceiveMessage);
     };
   }, [userEmail, friendEmail]);
 
   useEffect(() => {
-    // Scroll to the bottom when messages are loaded or updated
+     
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
     }
@@ -74,17 +74,17 @@ const ChatWindow: React.FC<{ userEmail: string; friendEmail: string }> = ({ user
       createdAt: new Date().toISOString(),
     };
 
-    // Emit the message via socket
+     
     socket.emit('sendMessage', message);
 
-    // Save the message to the database
+    
     await fetch(`/api/messages/${userEmail}/${friendEmail}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(message),
     });
 
-    // Clear the input field after sending the message
+    
     setNewMessage('');
   };
 

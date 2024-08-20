@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '../../../../lib/dbConnect';
-import Group from '../../../../models/Groups'; // Adjust the path if necessary
+import Group from '../../../../models/Groups';  
 
 export async function POST(req: NextRequest) {
   try {
-    await dbConnect(); // Ensure you connect to the database
+    await dbConnect();  
 
     const { name, members } = await req.json();
 
