@@ -23,7 +23,7 @@ interface Message {
   groupId: string;
 }
 
-const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group,userId,userEmail }) => {
+const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group, userId, userEmail }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -33,7 +33,6 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group,userId,userEmai
   const [editingDescription, setEditingDescription] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-   
   const handleReceiveMessage = (message: Message) => {
     console.log('Received message:', message);  
     if (message.groupId === group._id) {
@@ -41,23 +40,42 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group,userId,userEmai
     }
   };
 
+  const handleDescriptionUpdate = async () => {
+    try {
+      await fetch(`/api/groups/${group._id}/description`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description }),
+      });
+
+      // Emit the updated description to the server
+      socket?.emit('updateDescription', { groupId: group._id, description });
+      setEditingDescription(false);
+    } catch (error) {
+      console.error('Failed to update description:', error);
+    }
+  };
+
   useEffect(() => {
-     
     const socketIo = io();
     setSocket(socketIo);
-
-    
+  
     socketIo.on('receiveMessage', handleReceiveMessage);
-
-     
+    socketIo.on('descriptionUpdated', (updatedDescription: string) => {
+      setDescription(updatedDescription);
+    });
+  
+    socketIo.emit('joinGroup', group._id);
+  
     return () => {
       socketIo.off('receiveMessage', handleReceiveMessage);
+      socketIo.off('descriptionUpdated');
       socketIo.disconnect();
     };
-  }, [group._id]);  
+  }, [group._id]);
+  
 
   useEffect(() => {
-     
     const fetchMessages = async () => {
       try {
         const response = await axios.get(`/api/groups/messages?groupId=${group._id}`);
@@ -69,7 +87,6 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group,userId,userEmai
 
     fetchMessages();
 
-     
     const fetchGroupMembers = async () => {
       try {
         const response = await axios.post('/api/groups/members', { memberIds: group.members });
@@ -81,13 +98,11 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group,userId,userEmai
 
     fetchGroupMembers();
 
-     
     setDescription(group.description || '');
     setEditingDescription(false);
   }, [group._id, group.description, group.members]);
 
   useEffect(() => {
-     
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -117,18 +132,6 @@ const GroupChatWindow: React.FC<GroupChatWindowProps> = ({ group,userId,userEmai
       setNewMessage('');
     } catch (error) {
       console.error('Failed to send message:', error);
-    }
-  };
-
-  const handleDescriptionUpdate = async () => {
-    try {
-      await fetch(`/api/groups/${group._id}/description`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description }),
-      });
-    } catch (error) {
-      console.error('Failed to update description:', error);
     }
   };
 
